@@ -1,0 +1,10 @@
+# Python files
+*__pycache__/
+*.pyc
+
+# SQLite3 Databases
+*.sqlite3
+
+# Visual Studio Code
+*.vscode/
+*.code-workspace
