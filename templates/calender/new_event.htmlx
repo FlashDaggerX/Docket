@@ -1,0 +1,14 @@
+{% extends 'base.htmlx' %}
+
+{% block head %}
+<title>New Event</title>
+{% endblock %}
+
+{% block body %}
+<form class="form" method="post">
+    {% csrf_token %}
+    {% load crispy_forms_tags %}
+    {{ event_form|crispy }}
+    <button type="submit" class="btn btn-success">Add Event</button>
+</form>
+{% endblock %}

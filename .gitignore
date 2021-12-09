@@ -5,6 +5,9 @@
 # SQLite3 Databases
 *.sqlite3
 
+# Django auto-generated files
+*migrations/
+
 # Visual Studio Code
 *.vscode/
 *.code-workspace
