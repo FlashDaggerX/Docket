@@ -11,7 +11,10 @@
         {% for event in events %}
         <div class="col-lg-4 fs-3">{{ event.title }}</div>
         <div class="col-lg-4 fs-3">{{ event.start_time }} - {{ event.end_time }}</div>
-        <div class="col-lg-4">BUTTONS</div>
+        <div class="col-lg-4">
+            <a class="btn btn-primary mx-1" href="{% url 'update_event' event.id %}">Update</a>
+            <a class="btn btn-danger" href="{% url 'delete_event' event.id %}">Delete</a>
+        </div>
         {% empty %}
         <h3 class="display-6 text-center">Either there are no events planned, or you're not logged in.</h3>
         {% endfor %}

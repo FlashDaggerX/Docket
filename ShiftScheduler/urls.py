@@ -21,7 +21,9 @@ import calender.views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.make_welcome, name='index'),
+    path('event/<int:id>', views.update_event, name='update_event'),
     path('event/new', views.new_event, name='new_event'),
+    path('event/delete/<int:id>', views.delete_event, name='delete_event'),
     path('user/', views.make_user, name='modify_user'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/new', views.new_user, name='new_user'),

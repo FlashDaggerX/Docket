@@ -4,7 +4,7 @@ from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
-from django.contrib.auth import login, logout, get_user
+from django.contrib.auth import login, get_user
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 import time
@@ -44,15 +44,27 @@ def make_shifts(request: HttpRequest) -> HttpResponse:
     return render(request, 'calender/shifts.html', context)
 
 def new_event(request: HttpRequest) -> HttpResponse:
-    event = EventForm(request.POST or None)
+    eventform = EventForm(request.POST or None)
 
     if request.method == 'POST':
-        if event.is_valid():
-            event.save(commit=True)
+        if eventform.is_valid():
+            eventform.save(commit=True)
             return redirect('index')
 
-    context = { 'user': get_user(request), 'event_form': event }
+    context = { 'user': get_user(request), 'event_form': eventform }
     return render(request, 'calender/new_event.html', context)
+
+def delete_event(request: HttpRequest, id: int) -> HttpResponse:
+    event = Event.objects.get(id=id)
+    event.delete()
+    return redirect('view_shifts')
+
+def update_event(request: HttpRequest, id: int) -> HttpResponse:
+    event = Event.objects.get(id=id)
+    eventform = EventForm(request.POST or None, instance=event)
+
+    context = { 'user': get_user(request), 'event_form': eventform }
+    return render(request, 'calender/update_event.html', context)
 
 def new_user(request: HttpRequest) -> HttpResponse:
     userform = UserCreationForm(request.POST or None)
