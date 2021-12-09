@@ -1,30 +1,25 @@
+from django.contrib.auth.models import AnonymousUser
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
 
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, get_user
+from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 import time
 from datetime import datetime
 
 from .models import Event, EventToEmployee, User
-from .forms import EventForm, UserCreateForm
+from .forms import EventForm
 
 # Create your views here.
-def make_calender(request: HttpRequest) -> HttpResponse:
+def make_welcome(request: HttpRequest) -> HttpResponse:
     events = Event.objects.all()
-
-    # event_ids = [e.id for e in events]
-    # employee_ids = {}
-    # employees = {}
-    # for eid in event_ids:
-    #     employee_ids[eid] = EventToEmployee.objects.get(event=eid)
-    #     employees[eid] = User.objects.get(id=employee_ids[eid])
 
     employees = []
     for event in events:
         try:
-            matches = EventToEmployee.objects.get(event=event.id)
+            matches = EventToEmployee.objects.get(event=event.id) #!
             names = []
             for match in matches:
                 names.append(User.objects.get(id=match.employee).first_name)
@@ -32,8 +27,14 @@ def make_calender(request: HttpRequest) -> HttpResponse:
         except EventToEmployee.DoesNotExist:
             employees.append('NEEDS SCHEDULING')
 
-    context = { 'events': events, 'employees': employees }
-    return render(request, 'calender/welcome.htmlx', context)
+    context = { 'user': get_user(request), 'events': events, 'employees': employees }
+    return render(request, 'calender/welcome.html', context)
+
+def make_shifts(request: HttpRequest) -> HttpResponse:
+    events = Event.objects.all()
+
+    context = { 'user': get_user(request), 'events': events }
+    return render(request, 'calender/shifts.html', context)
 
 def new_event(request: HttpRequest) -> HttpResponse:
     event = EventForm(request.POST or None)
@@ -43,17 +44,30 @@ def new_event(request: HttpRequest) -> HttpResponse:
             event.save(commit=True)
             return redirect('index')
 
-    context = { 'event_form': event }
-    return render(request, 'calender/new_event.htmlx', context)
+    context = { 'user': get_user(request), 'event_form': event }
+    return render(request, 'calender/new_event.html', context)
 
 def new_user(request: HttpRequest) -> HttpResponse:
-    user = UserCreateForm(request.POST or None)
+    userform = UserCreationForm(request.POST or None)
 
     if request.method == 'POST':
-        if user.is_valid():
-            newuser = user.save(commit=True)
+        if userform.is_valid():
+            newuser = userform.save(commit=True)
             login(request, newuser)
             return redirect('index')
 
-    context = { 'user_form': user }
-    return render(request, 'calender/new_user.htmlx', context)
+    context = { 'user': get_user(request), 'user_form': userform }
+    return render(request, 'calender/new_user.html', context)
+
+def make_user(request: HttpRequest) -> HttpResponse:
+    user = get_user(request)
+    if user is AnonymousUser:
+        return redirect('new_user')
+
+    userform = UserChangeForm(request.POST or None, instance=user)
+    if request.method == 'POST':
+        userform.save(commit=True)
+        return redirect('index')
+
+    context = { 'user': user, 'user_form': userform }
+    return render(request, 'calender/modify_user.html', context)

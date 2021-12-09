@@ -1,4 +1,4 @@
-{% extends 'base.htmlx' %}
+{% extends 'base.html' %}
 
 {% block head %}
 <title>Shift Scheduler</title>
@@ -12,9 +12,9 @@
     <div class="row m-1 b-1 shadow p-2 mb-5 bg-white rounded border">
         <h3 class="display-6 text-center">Today's shifts</h3>
         {% for event in events %}
-        <div class="col-lg-6">{{ event.title }}: {{ event.start_time }}</div>
+        <div class="col-lg-6 text-end fs-5">{{ event.title }}: {{ event.start_time }}</div>
         {% load index %}
-        <div class="col-lg-6">
+        <div class="col-lg-6 fs-5">
             {{ employees|index:forloop.counter0 }}
         </div>
         {% empty %}

@@ -23,7 +23,7 @@
                         <a class="nav-link active" href="#">Calender</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Shifts</a>
+                        <a class="nav-link" href="{% url 'view_shifts' %}">Shifts</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'new_event' %}">Add New Event</a>
@@ -46,8 +46,25 @@
                     {% endblock %}
                 </ul>
             </div>
-            {% block navbar-body %}
-            {% endblock %}
+            <div class="d-flex">
+                <ul class="navbar-nav">
+                    {% if user.username != "" %}
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'modify_user' %}">{{ user.first_name }}</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-info mx-1" href="{% url 'logout' %}">Change Availability</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="{% url 'login' %}">Login</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </div>
     </nav>
     {% block body %}

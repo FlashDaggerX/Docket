@@ -1,14 +1,14 @@
-{% extends 'base-form.htmlx' %}
+{% extends 'base-form.html' %}
 
 {% block head %}
-<title>New Event</title>
+<title>Add a new user</title>
 {% endblock %}
 
 {% block form %}
 <form class="form justify-content-center g-2" method="post">
     {% csrf_token %}
     {% load crispy_forms_tags %}
-    {{ event_form|crispy }}
-    <button type="submit" class=" my-2 btn btn-success">Add Event</button>
+    {{ user_form|crispy }}
+    <button type="submit" class="my-2 btn btn-success">Add User</button>
 </form>
 {% endblock %}
