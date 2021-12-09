@@ -21,5 +21,6 @@ import calender.views as views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.make_calender, name='index'),
-    path('newevent/', views.new_event, name='new_event')
+    path('newevent/', views.new_event, name='new_event'),
+    path('newuser/', views.new_user, name='new_user')
 ]

@@ -1,0 +1,14 @@
+{% extends 'base.htmlx' %}
+
+{% block head %}
+<title>New Event</title>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid p-4">
+    <div class="row text-center shadow p-2 mb-5 bg-white rounded border">
+        {% block form %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock %}
