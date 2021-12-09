@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AnonymousUser
+from django.db.models.manager import BaseManager
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
@@ -14,7 +15,8 @@ from .forms import EventForm
 
 # Create your views here.
 def make_welcome(request: HttpRequest) -> HttpResponse:
-    events = Event.objects.all()
+    user = get_user(request)
+    events = Event.objects.all() if user.username != "" else Event.objects.none()
 
     employees = []
     for event in events:
@@ -27,10 +29,15 @@ def make_welcome(request: HttpRequest) -> HttpResponse:
         except EventToEmployee.DoesNotExist:
             employees.append('NEEDS SCHEDULING')
 
-    context = { 'user': get_user(request), 'events': events, 'employees': employees }
+    context = { 'user': user, 'events': events, 'employees': employees }
     return render(request, 'calender/welcome.html', context)
 
 def make_shifts(request: HttpRequest) -> HttpResponse:
+    user = get_user(request)
+    if user.username == "":
+        context = { 'user': user, 'events': Event.objects.none() }
+        return render(request, 'calender/shifts.html', context)
+
     events = Event.objects.all()
 
     context = { 'user': get_user(request), 'events': events }
@@ -61,7 +68,7 @@ def new_user(request: HttpRequest) -> HttpResponse:
 
 def make_user(request: HttpRequest) -> HttpResponse:
     user = get_user(request)
-    if user is AnonymousUser:
+    if user.username == "":
         return redirect('new_user')
 
     userform = UserChangeForm(request.POST or None, instance=user)
