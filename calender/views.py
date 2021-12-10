@@ -63,6 +63,11 @@ def update_event(request: HttpRequest, id: int) -> HttpResponse:
     event = Event.objects.get(id=id)
     eventform = EventForm(request.POST or None, instance=event)
 
+    if request.method == 'POST':
+        if eventform.is_valid():
+            eventform.save(commit=True)
+            return redirect('view_shifts')
+
     context = { 'user': get_user(request), 'event_form': eventform }
     return render(request, 'calender/update_event.html', context)
 

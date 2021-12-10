@@ -10,7 +10,7 @@ class Event(models.Model):
     end_time = models.DateTimeField(default=datetime.now().strftime("%D %I:%M%p"))
 
 # A block of time which the employee can't be scheduled for
-class NonSchedulableTime(models.Model):
+class Conflict(models.Model):
     employee = models.ForeignKey(User, on_delete=models.CASCADE)
     start_time = models.DateTimeField(default=datetime.now().strftime("%D %I:%M%p"))
     end_time = models.DateTimeField(default=datetime.now().strftime("%D %I:%M%p"))
