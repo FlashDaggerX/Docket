@@ -11,12 +11,16 @@ class EventForm(forms.ModelForm):
         input_formats=['%m/%d/%y %I:%M%p'],
         widget=forms.widgets.DateTimeInput(
             format="%m/%d/%y %I:%M%p",
-            attrs={'placeholder':"MM/DD/YY HH:MM(AP)"}))
+            attrs={'class': 'form-control datetimepicker-input',
+                    'data-target': '#datetimepicker1',
+                    'placeholder':"MM/DD/YY HH:MM(AP)"}))
     end_time = forms.DateTimeField(
         input_formats=['%m/%d/%y %I:%M%p'],
         widget=forms.widgets.DateTimeInput(
             format="%m/%d/%y %I:%M%p",
-            attrs={'placeholder':"MM/DD/YY HH:MM(AP)"}))
+            attrs={'class': 'form-control datetimepicker-input',
+                    'data-target': '#datetimepicker2',
+                    'placeholder':"MM/DD/YY HH:MM(AP)"}))
     class Meta:
         model = Event
         fields = "__all__"

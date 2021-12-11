@@ -21,7 +21,7 @@ def make_welcome(request: HttpRequest) -> HttpResponse:
     employees = []
     for event in events:
         try:
-            matches = EventToEmployee.objects.get(event=event.id) #!
+            matches = EventToEmployee.objects.get(event=event) #!
             names = []
             for match in matches:
                 names.append(User.objects.get(id=match.employee).first_name)
