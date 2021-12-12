@@ -27,4 +27,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/new', views.new_user, name='new_user'),
     path('shifts/', views.make_shifts, name='view_shifts'),
+    path('conflicts/', views.update_conflict, name='update_conflict'),
+    path('conflicts/rc/<int:id>', views.delete_conflict_rc, name='delete_conflict_rc'),
+    path('conflicts/c/<int:id>', views.delete_conflict_c, name='delete_conflict_c'),
 ]

@@ -1,0 +1,127 @@
+{% extends 'base-form.html' %}
+{% load crispy_forms_tags %}
+{% load totime %}
+
+{% block head %}
+<link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"
+    integrity="sha384-wvfXpqpZZVQGK6TAh5PVlGOfQNHSoD2xbE+QkPxCAFlNEevoEH3Sl0sibVcOQVnN" crossorigin="anonymous">
+<!-- Moment.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.23.0/moment.min.js"
+    integrity="sha256-VBLiveTKyUZMEzJd6z2mhfxIqz3ZATCuVMawPZGzIfA=" crossorigin="anonymous"></script>
+
+<!-- Tempus Dominus Bootstrap 4 -->
+<link rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/css/tempusdominus-bootstrap-4.min.css"
+    integrity="sha256-XPTBwC3SBoWHSmKasAk01c08M6sIA5gF5+sRxqak2Qs=" crossorigin="anonymous" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.1.2/js/tempusdominus-bootstrap-4.min.js"
+    integrity="sha256-z0oKYg6xiLq3yJGsp/LsY9XykbweQlHl42jHv2XTBz4=" crossorigin="anonymous"></script>
+
+<title>Shifty Scheduler</title>
+{% endblock %}
+
+{% block form %}
+<div class="col-lg-6 my-auto g-2">
+    <div class="display-2">{{ user.first_name }} {{ user.last_name }}</div>
+    <form class="align-items-center text-center g-2 my-2" method="post">
+        {% csrf_token %}
+        {{ conflict_form.errors }}
+        <div class="col-12">
+            {{ conflict_form.repeated.label_tag }}
+            {{ conflict_form.repeated }}
+        </div>
+        <div class="col-12" id="repeated_days_group" hidden="true">
+            {{ conflict_form.repeated_days.label_tag }}
+            {{ conflict_form.repeated_days }}
+        </div>
+        <div class="col-12" id="day_group">
+            {{ conflict_form.day.label_tag }}
+            <div class="input-group date" id="datetimepicker1" data-target-input="nearest">
+                {{ conflict_form.day }}
+                <div class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            {{ conflict_form.start_time.label_tag }}
+            <div class="input-group date" id="datetimepicker2" data-target-input="nearest">
+                {{ conflict_form.start_time }}
+                <div class="input-group-append" data-target="#datetimepicker2" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            {{ conflict_form.end_time.label_tag }}
+            <div class="input-group date" id="datetimepicker3" data-target-input="nearest">
+                {{ conflict_form.end_time }}
+                <div class="input-group-append" data-target="#datetimepicker3" data-toggle="datetimepicker">
+                    <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                </div>
+            </div>
+        </div>
+        <button type="submit" class="my-2 btn btn-success">Add Conflict</button>
+
+        <script>
+            $('#id_repeated').click((event) => {
+                $('#repeated_days_group').prop('hidden', !($('#id_repeated').prop('checked')));
+                $('#day_group').prop('hidden', $('#id_repeated').prop('checked'));
+            });
+
+            $(function () {
+                $("#datetimepicker1").datetimepicker({
+                    format: 'MM/DD/YYYY',
+                });
+            });
+
+            $(function () {
+                $("#datetimepicker2").datetimepicker({
+                    format: 'hh:mm A',
+                });
+            });
+
+            $(function () {
+                $("#datetimepicker3").datetimepicker({
+                    format: 'hh:mm A',
+                });
+            });
+        </script>
+    </form>
+</div>
+<div class="col-lg-6 g-2">
+    <div class="row">
+        <div class="display-2 text-center">Current Conflicts</div>
+    </div>
+    <div class="row">
+        <table>
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rc in repeat_conflicts %}
+                <tr>
+                    <td>{{ rc.day }}</td>
+                    <td>{{ rc.start_time }} - {{ rc.end_time }}</td>
+                    <td>
+                        <a class="btn btn-danger" href="{% url 'delete_conflict_rc' rc.id %}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+                {% for c in conflicts %}
+                <tr>
+                    <td>{{ c.start_time|totime:1 }}</td>
+                    <td>{{ c.start_time|totime:0 }} - {{ c.end_time|totime:0 }}</td>
+                    <td>
+                        <a class="btn btn-danger" href="{% url 'delete_conflict_c' c.id %}">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
