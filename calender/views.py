@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AnonymousUser
 from django.db.models.manager import BaseManager
+from django.db.models.query import QuerySet
 from django.http.request import HttpRequest
 from django.http.response import HttpResponse
 from django.shortcuts import render, redirect
@@ -10,7 +11,7 @@ from django.contrib.auth.forms import UserChangeForm
 from datetime import datetime, timedelta, time, date
 
 from .models import Event, EventToEmployee, RepeatedConflict, User, Conflict
-from .forms import EventForm, UserCreateForm, ConflictForm
+from .forms import EventForm, UserCreateForm, ConflictForm, ScheduleForm
 
 # Create your views here.
 def make_welcome(request: HttpRequest) -> HttpResponse:
@@ -27,7 +28,7 @@ def make_welcome(request: HttpRequest) -> HttpResponse:
     employees = []
     for event in events:
         try:
-            matches = EventToEmployee.objects.get(event=event) #!
+            matches = EventToEmployee.objects.filter(event=event) #!
             names = []
             for match in matches:
                 names.append(User.objects.get(id=match.employee.id).first_name)
@@ -45,8 +46,18 @@ def make_shifts(request: HttpRequest) -> HttpResponse:
         return render(request, 'calender/shifts.html', context)
 
     events = Event.objects.all()
+    employees = []
+    for event in events:
+        try:
+            matches = EventToEmployee.objects.filter(event=event) #!
+            names = []
+            for match in matches:
+                names.append(User.objects.get(id=match.employee.id).first_name)
+            employees.append("".join([n+', ' for n in names]))
+        except EventToEmployee.DoesNotExist:
+            employees.append('NEEDS SCHEDULING')
 
-    context = { 'user': get_user(request), 'events': events }
+    context = { 'user': user, 'events': events, 'employees': employees }
     return render(request, 'calender/shifts.html', context)
 
 def new_event(request: HttpRequest) -> HttpResponse:
@@ -66,15 +77,42 @@ def delete_event(request: HttpRequest, id: int) -> HttpResponse:
     return redirect('view_shifts')
 
 def update_event(request: HttpRequest, id: int) -> HttpResponse:
+    user = get_user(request)
+    if user.username == "":
+        return redirect('index')
+
     event = Event.objects.get(id=id)
     eventform = EventForm(request.POST or None, instance=event)
+    scheduleform = ScheduleForm(request.POST or None)
 
     if request.method == 'POST':
         if eventform.is_valid():
             eventform.save(commit=True)
-            return redirect('view_shifts')
+        if scheduleform.is_valid():
+            data = scheduleform.cleaned_data
+            etime = event.start_time
+            # Clear the list before replacing it
+            EventToEmployee.objects.filter(event=event).delete()
+            for employee in data['employees']:
+                if not EventToEmployee.objects.filter(employee=employee).exists():
+                    conflicts = Conflict.objects.filter(employee=employee)
+                    repeat_conflicts = RepeatedConflict.objects.filter(employee=employee)
 
-    context = { 'user': get_user(request), 'event_form': eventform }
+                    has_conflict = False
+                    for conflict in conflicts:
+                        if Conflict.is_conflict(conflict, etime):
+                            has_conflict = True
+                            break
+                    if not has_conflict:
+                        for conflict in repeat_conflicts:
+                            if RepeatedConflict.is_conflict(conflict, etime):
+                                has_conflict = True
+                                break
+                    if not has_conflict:
+                        EventToEmployee.objects.create(employee=employee, event=event)
+        return redirect('view_shifts')
+
+    context = { 'user': user, 'event_form': eventform, 'schedule_form': scheduleform }
     return render(request, 'calender/update_event.html', context)
 
 def update_conflict(request: HttpRequest) -> HttpResponse:
@@ -107,8 +145,8 @@ def update_conflict(request: HttpRequest) -> HttpResponse:
                 conflict.save()
             conflictform = ConflictForm()
 
-    conflicts = Conflict.objects.all()
-    rc = RepeatedConflict.objects.all()
+    conflicts = Conflict.objects.filter(employee=user)
+    rc = RepeatedConflict.objects.filter(employee=user)
 
     context = { 'user': user, 'repeat_conflicts': rc, 'conflicts': conflicts, 'conflict_form': conflictform }
     return render(request, 'calender/update_conflict.html', context)

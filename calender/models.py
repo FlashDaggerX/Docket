@@ -34,7 +34,7 @@ class RepeatedConflict(models.Model):
         et: time = obj.end_time
 
         totime = lambda d: datetime.time(d)
-        return date.strftime("%A") == obj.day and not totime(st) < totime(date) < totime(et)
+        return date.strftime("%A") == obj.day and not st < totime(date) < et
 
 # Keeps a mapping of employees to events
 class EventToEmployee(models.Model):

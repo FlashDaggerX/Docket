@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load index %}
 
 {% block head %}
 <title>Shifty Scheduler</title>
@@ -9,8 +10,11 @@
     <div class="row text-center m-1 b-1 shadow p-2 mb-5 bg-white rounded border">
         <h3 class="display-3 text-center">All Shifts</h3>
         {% for event in events %}
-        <div class="col-lg-4 fs-3">{{ event.title }}</div>
-        <div class="col-lg-4 fs-3">{{ event.start_time }} - {{ event.end_time }}</div>
+        <div class="col-lg-4 fs-4">{{ event.title }}</div>
+        <div class="col-lg-4 fs-4">
+            <p>{{ event.start_time }} - {{ event.end_time }}</p>
+            {{ employees|index:forloop.counter0 }}
+        </div>
         <div class="col-lg-4">
             <a class="btn btn-primary mx-1" href="{% url 'update_event' event.id %}">Update</a>
             <a class="btn btn-danger" href="{% url 'delete_event' event.id %}">Delete</a>

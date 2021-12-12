@@ -23,6 +23,7 @@
         <form class="form" method="post">
             <!-- https://simpleisbetterthancomplex.com/tutorial/2019/01/03/how-to-use-date-picker-with-django.html -->
             {% csrf_token %}
+            {{ event_form.errors }}
             <div class="row justify-content-center my-3">
                 <label for="title">{{ event_form.title.label }}</label>
                 <div class="col-4">

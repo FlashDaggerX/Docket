@@ -20,22 +20,26 @@ DAYS = (
 
 class EventForm(forms.ModelForm):
     start_time = forms.DateTimeField(
-        input_formats=['%m/%d/%y %I:%M%p'],
+        input_formats=['%m/%d/%Y %I:%M %p'],
         widget=forms.widgets.DateTimeInput(
-            format="%m/%d/%y %I:%M%p",
+            format="%m/%d/%Y %I:%M %p",
             attrs={'class': 'form-control datetimepicker-input',
                     'data-target': '#datetimepicker1',
                     'placeholder':"MM/DD/YY HH:MM(AP)"}))
     end_time = forms.DateTimeField(
-        input_formats=['%m/%d/%y %I:%M%p'],
+        input_formats=['%m/%d/%Y %I:%M %p'],
         widget=forms.widgets.DateTimeInput(
-            format="%m/%d/%y %I:%M%p",
+            format="%m/%d/%Y %I:%M %p",
             attrs={'class': 'form-control datetimepicker-input',
                     'data-target': '#datetimepicker2',
                     'placeholder':"MM/DD/YY HH:MM(AP)"}))
     class Meta:
         model = Event
         fields = "__all__"
+
+class ScheduleForm(forms.Form):
+    employees = forms.ModelMultipleChoiceField(
+        queryset=User.objects.filter(is_superuser=False))
 
 class ConflictForm(forms.Form):
     repeated = forms.BooleanField(
