@@ -5,6 +5,11 @@ import sys
 
 
 def main():
+    try:
+        from Docket.secrets import SECRET_KEY # type: ignore
+    except ImportError as exc:
+        raise ImportError("The secrets file does not exist! Run \"generate_secrets.py\"") from exc
+
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Docket.settings')
     try:
@@ -15,6 +20,7 @@ def main():
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
     execute_from_command_line(sys.argv)
 
 

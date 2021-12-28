@@ -7,6 +7,7 @@
 
 # Django auto-generated files
 *migrations/
+Docket/secrets.py
 
 # Visual Studio Code
 *.vscode/
